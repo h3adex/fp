@@ -9,7 +9,7 @@ Help the server obtain the client's Ja3 fingerprint, http2 fingerprint, Ja4 fing
 # get started
 ## install
 ```
-go get github.com/gospider007/fp
+go get github.com/h3adex/fp
 ```
 ## quick start with gin
 ```go
@@ -19,7 +19,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gospider007/fp"
+	"github.com/h3adex/fp/fp"
 )
 
 func main() {

@@ -16,14 +16,15 @@ import (
 )
 
 type Option struct {
-	Addr        string
-	CertFile    string
-	KeyFile     string
-	Certificate tls.Certificate
-	NextProtos  []string
-	Handler     http.Handler
-	AcmeDomain  string
-	AcmeEmail   string
+	Addr           string
+	CertFile       string
+	KeyFile        string
+	Certificate    tls.Certificate
+	GetCertificate func(clientHello *tls.ClientHelloInfo) (*tls.Certificate, error)
+	NextProtos     []string
+	Handler        http.Handler
+	AcmeDomain     string
+	AcmeEmail      string
 }
 
 func newTlsConfig(option Option) (*tls.Config, error) {
@@ -175,9 +176,22 @@ func Server(ctx context.Context, handler http.Handler, options ...Option) (err e
 	if server.listener, err = net.Listen("tcp", option.Addr); err != nil {
 		return err
 	}
-	if server.tlsConfig, err = newTlsConfig(option); err != nil {
-		return err
+
+	if option.GetCertificate == nil {
+		if server.tlsConfig, err = newTlsConfig(option); err != nil {
+			return err
+		}
+	} else {
+		server.tlsConfig = &tls.Config{
+			GetCertificate: option.GetCertificate,
+		}
 	}
-	go server.listen()
+
+	go func() {
+		err := server.listen()
+		if err != nil {
+
+		}
+	}()
 	return server.serve()
 }
